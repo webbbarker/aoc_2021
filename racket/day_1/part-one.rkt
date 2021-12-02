@@ -5,7 +5,7 @@
 
 (define (windows acc lst n)
   (if (> n (length lst))
-      acc
+      (reverse acc)
       (windows (cons (take lst n) acc)
                (rest lst)
                n)))
