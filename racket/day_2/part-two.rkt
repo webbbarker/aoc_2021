@@ -14,7 +14,7 @@
 (define (traverse act pos)
   (let ([dist (car pos)]
         [depth (cadr pos)]
-        [aim (last pos)])
+        [aim (caddr pos)])
     (match act
       [(list "forward" n) (list (+ dist n) (+ depth (* aim n)) aim)]
       [(list "up" n) (list dist depth (- aim n))]
