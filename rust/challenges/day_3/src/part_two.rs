@@ -14,7 +14,7 @@ fn main() {
         .collect();
     let test_bit_length = test_data[0].len();
 
-    println!("[Test] 230 = {}", solve(&test_values, test_bit_length));
+    println!("[Test] 230 = {}", new_solve(&test_values, test_bit_length));
 
     if let Ok(live_data) = read_lines("challenges/day_3/input/input.txt") {
         let raw_data: Vec<String> = live_data.map(|line| line.unwrap()).collect();
@@ -24,8 +24,53 @@ fn main() {
             .collect();
         let live_bit_length = raw_data[0].len();
 
-        println!("[PartTwo] {}", solve(&live_values, live_bit_length));
+        println!("[PartTwo] {}", new_solve(&live_values, live_bit_length));
     }
+}
+
+fn new_solve(data: &[u64], bit_length: usize) -> u64 {
+    let ox_reading = (0..bit_length)
+        .rev()
+        .fold(data.to_vec(), |values, i| {
+            if values.len() == 1 {
+                values
+            } else {
+                let bit_count = bit_count_at(&values, i);
+                let expected = if bit_count >= values.len() - bit_count { 1 } else { 0 };
+
+                values
+                    .iter()
+                    .filter(|&&v| v >> i & 1 == expected)
+                    .copied()
+                    .collect()
+            }
+        })
+        .first()
+        .unwrap()
+        .to_owned();
+    let co_reading = (0..bit_length)
+        .rev()
+        .fold(data.to_vec(), |values, i| {
+            if values.len() == 1 {
+                values
+            } else {
+                let bit_count = bit_count_at(&values, i);
+                let expected = if bit_count >= values.len() - bit_count { 1 } else { 0 };
+
+                values
+                    .iter()
+                    .filter(|&&v| v >> i & 1 != expected)
+                    .copied()
+                    .collect()
+            }
+        })
+        .first()
+        .unwrap()
+        .to_owned();
+
+    println!("{}, {}", ox_reading, co_reading);
+
+    ox_reading * co_reading
 }
 
 fn solve(data: &[u64], bit_length: usize) -> u64 {
@@ -40,9 +85,11 @@ fn solve(data: &[u64], bit_length: usize) -> u64 {
             ox_mask &= !(1 << i);
         }
 
-        let values: Vec<u64> = ox_data.iter().filter(|&&v| {
-            v >> i == ox_mask >> i
-        }).copied().collect();
+        let values: Vec<u64> = ox_data
+            .iter()
+            .filter(|&&v| v >> i == ox_mask >> i)
+            .copied()
+            .collect();
 
         if values.len() == 1 {
             ox_reading = *values.first().unwrap();
@@ -63,10 +110,12 @@ fn solve(data: &[u64], bit_length: usize) -> u64 {
             co_mask |= 1 << i;
         }
 
-        let values: Vec<u64> = co_data.iter().filter(|&&v| {
-            v >> i == co_mask >> i
-        }).copied().collect();
-        
+        let values: Vec<u64> = co_data
+            .iter()
+            .filter(|&&v| v >> i == co_mask >> i)
+            .copied()
+            .collect();
+
         if values.len() == 1 {
             co_reading = *values.first().unwrap();
             break;
