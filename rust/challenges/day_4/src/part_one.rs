@@ -55,12 +55,18 @@ impl Board {
         let mut iters: Vec<_> = numbers.into_iter().map(|n| n.into_iter()).collect();
         let cols = (0..len)
             .map(|_| {
-                iters.iter_mut()
+                iters
+                    .iter_mut()
                     .map(|n| n.next().unwrap())
                     .collect::<Vec<u64>>()
-            }).collect();
+            })
+            .collect();
 
-        Board {hit_values: HashSet::new(), rows: rows, cols: cols}
+        Board {
+            hit_values: HashSet::new(),
+            rows: rows,
+            cols: cols,
+        }
     }
 
     fn mark_draw(&mut self, n: u64) -> bool {
@@ -88,7 +94,12 @@ impl Board {
     }
 
     fn unmatch_numbers(&self) -> Vec<u64> {
-        self.rows.iter().flat_map(|r| r).filter(|&v| !self.hit_values.contains(v)).copied().collect()
+        self.rows
+            .iter()
+            .flat_map(|r| r)
+            .filter(|&v| !self.hit_values.contains(v))
+            .copied()
+            .collect()
     }
 }
 
@@ -100,15 +111,31 @@ struct Game {
 
 impl Game {
     fn parse(values: Vec<&str>) -> Self {
-        let draws: Vec<u64> = values[0].split(",").map(|s| s.parse::<u64>().unwrap()).collect();
-        let boards: Vec<Board> = values.split(|&line| line.is_empty()).skip(1).map(|rows|{
-            let numbers: Vec<Vec<u64>> = rows.iter().map(|&row| {
-                row.split(" ").filter(|&s| !s.is_empty()).map(|s| s.parse::<u64>().unwrap()).collect::<Vec<u64>>()
-            }).collect();
-            Board::new(numbers)
-        }).collect();
+        let draws: Vec<u64> = values[0]
+            .split(",")
+            .map(|s| s.parse::<u64>().unwrap())
+            .collect();
+        let boards: Vec<Board> = values
+            .split(|&line| line.is_empty())
+            .skip(1)
+            .map(|rows| {
+                let numbers: Vec<Vec<u64>> = rows
+                    .iter()
+                    .map(|&row| {
+                        row.split(" ")
+                            .filter(|&s| !s.is_empty())
+                            .map(|s| s.parse::<u64>().unwrap())
+                            .collect::<Vec<u64>>()
+                    })
+                    .collect();
+                Board::new(numbers)
+            })
+            .collect();
 
-        Game { draws: draws, boards: boards}
+        Game {
+            draws: draws,
+            boards: boards,
+        }
     }
 
     fn play(&mut self) -> u64 {
