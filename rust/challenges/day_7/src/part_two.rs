@@ -27,16 +27,14 @@ fn main() {
 }
 
 fn solve(data: &[i64]) -> i64 {
-    let mut sorted = data.to_vec();
-    sorted.sort();
+    let (low,high) = average(data);
 
-    let min_point: i64 = sorted.iter().min().unwrap().to_owned();
-    let max_point: i64 = sorted.iter().max().unwrap().to_owned();
+    vec![low, high].iter().map(|&target| fuel_cost(data, target)).min().unwrap()
+}
 
-    (min_point..max_point)
-        .map(|t| fuel_cost(&sorted, t))
-        .min()
-        .unwrap()
+fn average(data: &[i64]) -> (i64,i64) {
+    let low = data.iter().sum::<i64>() / data.len() as i64;
+    (low, low + 1)
 }
 
 fn fuel_cost(pos: &[i64], target: i64) -> i64 {
