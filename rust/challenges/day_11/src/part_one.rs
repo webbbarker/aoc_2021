@@ -44,7 +44,7 @@ fn main() {
 fn solve(data: &Vec<Vec<u64>>, step_count: u64) -> u64 {
     let mut grid = data.to_vec();
     let mut flashes: u64 = 0;
-    for i in 0..step_count {
+    for _ in 0..step_count {
         increment_all(&mut grid);
 
         let mut flashed = HashSet::new();
