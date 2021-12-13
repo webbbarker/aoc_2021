@@ -104,23 +104,27 @@ impl Graph {
     fn paths(&self) -> Vec<Vec<Node>> {
         let mut paths = Vec::new();
 
-        for little in self.nodes.iter().filter(|&n| n.is_little()) {
-            self.visit_node(&mut Vec::new(), &Node::Start, little, &mut paths);
-        }
+        self.visit_node(&mut Vec::new(), &Node::Start, false, &mut paths);
 
-        let mut seen_paths: HashSet<Vec<Node>> = HashSet::new();
-        for path in paths {
-            seen_paths.insert(path);
-        }
+        paths
 
-        seen_paths.drain().collect()
+        // for little in self.nodes.iter().filter(|&n| n.is_little()) {
+        //     self.visit_node(&mut Vec::new(), &Node::Start, little, &mut paths);
+        // }
+
+        // let mut seen_paths: HashSet<Vec<Node>> = HashSet::new();
+        // for path in paths {
+        //     seen_paths.insert(path);
+        // }
+
+        // seen_paths.drain().collect()
     }
 
     fn visit_node(
         &self,
         path: &mut Vec<Node>,
         n: &Node,
-        allowed_little: &Node,
+        has_dup: bool,
         results: &mut Vec<Vec<Node>>,
     ) {
         path.push(n.clone());
@@ -131,15 +135,13 @@ impl Graph {
             for adj in adj_nodes {
                 if adj.is_terminating() && path.contains(adj) {
                     continue;
-                } else if adj.is_little() && adj == allowed_little {
-                    if path.iter().filter(|&n| n == allowed_little).count() > 1 {
-                        continue;
-                    }
-                } else if adj.is_little() && path.contains(adj) {
+                } else if adj.is_little() && has_dup && path.contains(adj) {
                     continue;
+                } else if adj.is_little() && path.contains(adj) {
+                    self.visit_node(path, adj, true, results);
+                } else {
+                    self.visit_node(path, adj, has_dup, results);
                 }
-
-                self.visit_node(path, adj, allowed_little, results);
             }
         }
         path.pop();
