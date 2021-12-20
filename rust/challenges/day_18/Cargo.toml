@@ -14,3 +14,4 @@ name = "part_two"
 path = "src/part_two.rs"
 
 [dependencies]
+nom = "7.1.0"
